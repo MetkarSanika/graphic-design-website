@@ -79,57 +79,29 @@ function Portfolio() {
   return (
     <div className="portfolio-page">
 
-      {/* =====================================
-          HEADER
-      ===================================== */}
-{/* =====================================
-    NEW PORTFOLIO HERO
+      
+ {/* =====================================
+    HEADER
 ===================================== */}
 
-<section className="portfolio-page-hero">
+<div className="portfolio-header">
 
-  <div className="portfolio-hero-content">
+  <span>OUR WORK</span>
 
-    <span className="portfolio-hero-label">
-      ✦ OUR WORK
-    </span>
+  <h1>
+    Designs that
+    <br />
+    make brands{" "}
+    <span>stand out.</span>
+  </h1>
 
-    <h1>
-      Designs that
-      <br />
-      <span>make an impression.</span>
-    </h1>
+  <p>
+    Explore some of our creative graphic
+    design work. Our latest designs are
+    added regularly.
+  </p>
 
-    <p>
-      Explore our collection of creative designs,
-      crafted to help brands look professional,
-      memorable and unique.
-    </p>
-
-  </div>
-
-
-  {/* DECORATIVE DESIGN */}
-
-  <div className="portfolio-hero-art">
-
-    <div className="portfolio-art-circle"></div>
-
-    <div className="portfolio-art-box">
-      <span>SG</span>
-    </div>
-
-    <div className="portfolio-art-text">
-      CREATIVE
-      <br />
-      STUDIO
-    </div>
-
-  </div>
-
-</section>
-
-
+</div>
       {/* =====================================
           CONTENT
       ===================================== */}

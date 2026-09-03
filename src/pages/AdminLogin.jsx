@@ -14,8 +14,8 @@ function AdminLogin() {
     e.preventDefault();
 
     // Temporary admin credentials
-    const adminUsername = "admin";
-    const adminPassword = "admin123";
+    const adminUsername ="sanika";
+    const adminPassword = "sanika2114";
 
 
     if (

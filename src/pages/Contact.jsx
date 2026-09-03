@@ -156,37 +156,27 @@ Thank you.
     <div className="contact-page">
 
 
-      {/* ================================
-          HEADER
-      ================================= */}
 
-  <section className="page-hero contact-page-hero">
+ {/* =====================================
+    CONTACT HEADER
+===================================== */}
 
-  <div className="page-hero-content">
+<div className="contact-header">
 
-    <span className="page-hero-label">
-      ✦ LET'S CREATE
-    </span>
+  <span>LET'S WORK TOGETHER</span>
 
-    <h1>
-      Have an idea?
-      <br />
-      <span>Let's make it real.</span>
-    </h1>
+  <h1>
+    Have a project
+    <br />
+    <span>in mind?</span>
+  </h1>
 
-    <p>
-      Tell us about your project, and let's create
-      something meaningful for your brand.
-    </p>
+  <p>
+    Tell us about your project, and let's
+    create something amazing together.
+  </p>
 
-  </div>
-
-  <div className="page-hero-shape contact-shape">
-    <span>HELLO</span>
-  </div>
-
-</section>
-
+</div>
 
       {/* ================================
           CONTACT LAYOUT
