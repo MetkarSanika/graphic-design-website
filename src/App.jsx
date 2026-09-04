@@ -15,60 +15,41 @@ import PortfolioManager from "./pages/PortfolioManager";
 
 import ScrollToTop from "./ScrollToTop";
 
-
 function App() {
   return (
     <BrowserRouter>
 
-      {/* SCROLL TO TOP WHEN PAGE CHANGES */}
+      {/* SCROLL TO TOP */}
       <ScrollToTop />
 
       {/* NAVBAR */}
       <Navbar />
 
-      {/* ALL WEBSITE ROUTES */}
+      {/* ALL ROUTES */}
       <Routes>
 
         {/* MAIN WEBSITE */}
-        <Route
-          path="/"
-          element={<Home />}
-        />
+        <Route path="/" element={<Home />} />
 
-        <Route
-          path="/services"
-          element={<Services />}
-        />
+        <Route path="/services" element={<Services />} />
 
-        <Route
-          path="/portfolio"
-          element={<Portfolio />}
-        />
+        <Route path="/portfolio" element={<Portfolio />} />
 
-        <Route
-          path="/contact"
-          element={<Contact />}
-        />
+        <Route path="/contact" element={<Contact />} />
 
 
         {/* ADMIN */}
-        <Route
-          path="/admin"
-          element={<Admin />}
-        />
+        <Route path="/admin" element={<Admin />} />
 
-        <Route
-          path="/admin-login"
-          element={<AdminLogin />}
-        />
+        <Route path="/admin-login" element={<AdminLogin />} />
 
+        {/* PORTFOLIO ADMIN */}
         <Route
-          path="/admin/portfolio"
+          path="/admin-login/portfolio"
           element={<PortfolioManager />}
         />
 
       </Routes>
-
 
       {/* WHATSAPP BUTTON */}
       <WhatsAppButton />
@@ -79,6 +60,5 @@ function App() {
     </BrowserRouter>
   );
 }
-
 
 export default App;

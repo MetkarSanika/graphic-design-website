@@ -14,7 +14,15 @@ function PortfolioManager() {
   const [search, setSearch] = useState("");
   const [filterCategory, setFilterCategory] = useState("All");
 
-  const API = "http://localhost:5000";
+  // =====================================
+  // BACKEND API
+  // =====================================
+
+  const API = "";
+
+  // =====================================
+  // CATEGORIES
+  // =====================================
 
   const categories = [
     "Logo Design",
@@ -35,9 +43,7 @@ function PortfolioManager() {
     setLoading(true);
 
     try {
-      const response = await fetch(
-        `${API}/api/portfolio`
-      );
+      const response = await fetch(`${API}/api/portfolio`);
 
       const data = await response.json();
 
@@ -47,14 +53,24 @@ function PortfolioManager() {
         );
       }
 
-      setPortfolio(data);
+      setPortfolio(Array.isArray(data) ? data : []);
     } catch (error) {
-      console.error(error);
-      alert("Unable to connect to backend.");
+      console.error("Portfolio fetch error:", error);
+
+      alert(
+        error.message ||
+          "Unable to connect to backend."
+      );
+
+      setPortfolio([]);
     } finally {
       setLoading(false);
     }
   };
+
+  // =====================================
+  // LOAD PORTFOLIO
+  // =====================================
 
   useEffect(() => {
     fetchPortfolio();
@@ -67,7 +83,9 @@ function PortfolioManager() {
   const handleImageChange = (e) => {
     const selectedFile = e.target.files[0];
 
-    if (!selectedFile) return;
+    if (!selectedFile) {
+      return;
+    }
 
     const allowedTypes = [
       "image/jpeg",
@@ -76,25 +94,33 @@ function PortfolioManager() {
     ];
 
     if (!allowedTypes.includes(selectedFile.type)) {
-      alert("Please select JPG, PNG or WebP image.");
+      alert(
+        "Please select a JPG, PNG or WebP image."
+      );
+
       e.target.value = "";
       return;
     }
 
     if (selectedFile.size > 5 * 1024 * 1024) {
-      alert("Image size must be less than 5 MB.");
+      alert(
+        "Image size must be less than 5 MB."
+      );
+
       e.target.value = "";
       return;
     }
 
     setImage(selectedFile);
 
-    const imageUrl = URL.createObjectURL(selectedFile);
+    const imageUrl =
+      URL.createObjectURL(selectedFile);
+
     setPreview(imageUrl);
   };
 
   // =====================================
-  // RESET
+  // RESET FORM
   // =====================================
 
   const resetForm = () => {
@@ -105,7 +131,9 @@ function PortfolioManager() {
     setEditingId(null);
 
     const fileInput =
-      document.getElementById("portfolio-image");
+      document.getElementById(
+        "portfolio-image"
+      );
 
     if (fileInput) {
       fileInput.value = "";
@@ -113,7 +141,7 @@ function PortfolioManager() {
   };
 
   // =====================================
-  // SUBMIT
+  // ADD / UPDATE PORTFOLIO
   // =====================================
 
   const handleSubmit = async (e) => {
@@ -136,11 +164,23 @@ function PortfolioManager() {
 
     const formData = new FormData();
 
-    formData.append("title", title.trim());
-    formData.append("category", category);
+    formData.append(
+      "title",
+      title.trim()
+    );
 
+    formData.append(
+      "category",
+      category
+    );
+
+    // IMPORTANT:
+    // Backend expects the field name "image"
     if (image) {
-      formData.append("image", image);
+      formData.append(
+        "image",
+        image
+      );
     }
 
     try {
@@ -149,15 +189,24 @@ function PortfolioManager() {
         : `${API}/api/portfolio`;
 
       const response = await fetch(url, {
-        method: editingId ? "PUT" : "POST",
+        method: editingId
+          ? "PUT"
+          : "POST",
         body: formData,
       });
 
-      const data = await response.json();
+      let data = {};
+
+      try {
+        data = await response.json();
+      } catch {
+        data = {};
+      }
 
       if (!response.ok) {
         throw new Error(
-          data.message || "Operation failed."
+          data.message ||
+            "Portfolio operation failed."
         );
       }
 
@@ -171,7 +220,10 @@ function PortfolioManager() {
 
       await fetchPortfolio();
     } catch (error) {
-      console.error(error);
+      console.error(
+        "Portfolio submit error:",
+        error
+      );
 
       alert(
         error.message ||
@@ -206,7 +258,9 @@ function PortfolioManager() {
       "Are you sure you want to delete this design?"
     );
 
-    if (!confirmed) return;
+    if (!confirmed) {
+      return;
+    }
 
     try {
       const response = await fetch(
@@ -216,17 +270,25 @@ function PortfolioManager() {
         }
       );
 
-      const data = await response.json();
+      let data = {};
+
+      try {
+        data = await response.json();
+      } catch {
+        data = {};
+      }
 
       if (!response.ok) {
         throw new Error(
-          data.message || "Failed to delete design."
+          data.message ||
+            "Failed to delete design."
         );
       }
 
       setPortfolio((previous) =>
         previous.filter(
-          (item) => item.id !== id
+          (item) =>
+            item.id !== id
         )
       );
 
@@ -234,7 +296,10 @@ function PortfolioManager() {
         "Portfolio design deleted successfully."
       );
     } catch (error) {
-      console.error(error);
+      console.error(
+        "Portfolio delete error:",
+        error
+      );
 
       alert(
         error.message ||
@@ -247,10 +312,12 @@ function PortfolioManager() {
   // SEARCH + FILTER
   // =====================================
 
-  const filteredPortfolio = portfolio.filter(
-    (item) => {
+  const filteredPortfolio =
+    portfolio.filter((item) => {
       const searchText =
-        search.toLowerCase().trim();
+        search
+          .toLowerCase()
+          .trim();
 
       const matchesSearch =
         item.title
@@ -259,33 +326,43 @@ function PortfolioManager() {
 
       const matchesCategory =
         filterCategory === "All" ||
-        item.category === filterCategory;
+        item.category ===
+          filterCategory;
 
       return (
         matchesSearch &&
         matchesCategory
       );
-    }
-  );
+    });
+
+  // =====================================
+  // UI
+  // =====================================
 
   return (
     <div className="portfolio-manager">
 
+      {/* ================================= */}
       {/* HEADER */}
+      {/* ================================= */}
 
       <div className="portfolio-manager-header">
 
         <div>
           <span>ADMIN</span>
 
-          <h1>Portfolio Manager</h1>
+          <h1>
+            Portfolio Manager
+          </h1>
 
           <p>
-            Add and manage your portfolio designs.
+            Add and manage your
+            portfolio designs.
           </p>
         </div>
 
         <button
+          type="button"
           className="admin-refresh-button"
           onClick={fetchPortfolio}
         >
@@ -294,8 +371,9 @@ function PortfolioManager() {
 
       </div>
 
-
+      {/* ================================= */}
       {/* ADD / EDIT FORM */}
+      {/* ================================= */}
 
       <div className="portfolio-manager-form">
 
@@ -315,20 +393,23 @@ function PortfolioManager() {
 
         </div>
 
-
         <form onSubmit={handleSubmit}>
 
           {/* TITLE */}
 
           <div className="portfolio-form-group">
 
-            <label>Design Title</label>
+            <label>
+              Design Title
+            </label>
 
             <input
               type="text"
               value={title}
               onChange={(e) =>
-                setTitle(e.target.value)
+                setTitle(
+                  e.target.value
+                )
               }
               placeholder="Example: Modern Logo"
               required
@@ -336,32 +417,36 @@ function PortfolioManager() {
 
           </div>
 
-
           {/* CATEGORY */}
 
           <div className="portfolio-form-group">
 
-            <label>Category</label>
+            <label>
+              Category
+            </label>
 
             <select
               value={category}
               onChange={(e) =>
-                setCategory(e.target.value)
+                setCategory(
+                  e.target.value
+                )
               }
               required
             >
-              {categories.map((item) => (
-                <option
-                  key={item}
-                  value={item}
-                >
-                  {item}
-                </option>
-              ))}
+              {categories.map(
+                (item) => (
+                  <option
+                    key={item}
+                    value={item}
+                  >
+                    {item}
+                  </option>
+                )
+              )}
             </select>
 
           </div>
-
 
           {/* IMAGE */}
 
@@ -377,15 +462,17 @@ function PortfolioManager() {
               id="portfolio-image"
               type="file"
               accept=".jpg,.jpeg,.png,.webp"
-              onChange={handleImageChange}
+              onChange={
+                handleImageChange
+              }
             />
 
             <small>
-              JPG, PNG or WebP — maximum 5 MB.
+              JPG, PNG or WebP —
+              maximum 5 MB.
             </small>
 
           </div>
-
 
           {/* PREVIEW */}
 
@@ -399,7 +486,6 @@ function PortfolioManager() {
 
             </div>
           )}
-
 
           {/* BUTTONS */}
 
@@ -430,8 +516,9 @@ function PortfolioManager() {
 
       </div>
 
-
+      {/* ================================= */}
       {/* SEARCH + FILTER */}
+      {/* ================================= */}
 
       <div className="portfolio-manager-toolbar">
 
@@ -440,38 +527,47 @@ function PortfolioManager() {
           placeholder="Search designs..."
           value={search}
           onChange={(e) =>
-            setSearch(e.target.value)
+            setSearch(
+              e.target.value
+            )
           }
         />
 
         <select
           value={filterCategory}
           onChange={(e) =>
-            setFilterCategory(e.target.value)
+            setFilterCategory(
+              e.target.value
+            )
           }
         >
           <option value="All">
             All Categories
           </option>
 
-          {categories.map((item) => (
-            <option
-              key={item}
-              value={item}
-            >
-              {item}
-            </option>
-          ))}
+          {categories.map(
+            (item) => (
+              <option
+                key={item}
+                value={item}
+              >
+                {item}
+              </option>
+            )
+          )}
         </select>
 
       </div>
 
-
+      {/* ================================= */}
       {/* COUNT */}
+      {/* ================================= */}
 
       <div className="portfolio-manager-count">
 
-        <span>PORTFOLIO DESIGNS</span>
+        <span>
+          PORTFOLIO DESIGNS
+        </span>
 
         <strong>
           {filteredPortfolio.length}
@@ -479,8 +575,9 @@ function PortfolioManager() {
 
       </div>
 
-
+      {/* ================================= */}
       {/* LOADING */}
+      {/* ================================= */}
 
       {loading && (
         <div className="admin-message">
@@ -488,8 +585,9 @@ function PortfolioManager() {
         </div>
       )}
 
-
+      {/* ================================= */}
       {/* EMPTY */}
+      {/* ================================= */}
 
       {!loading &&
         filteredPortfolio.length === 0 && (
@@ -502,92 +600,102 @@ function PortfolioManager() {
           </div>
         )}
 
-
+      {/* ================================= */}
       {/* PORTFOLIO GRID */}
+      {/* ================================= */}
 
       {!loading &&
         filteredPortfolio.length > 0 && (
-
           <div className="portfolio-manager-grid">
 
-            {filteredPortfolio.map((item) => (
+            {filteredPortfolio.map(
+              (item) => (
+                <div
+                  className="portfolio-manager-card"
+                  key={item.id}
+                >
 
-              <div
-                className="portfolio-manager-card"
-                key={item.id}
-              >
+                  {/* IMAGE */}
 
-                <div className="portfolio-manager-image">
+                  <div className="portfolio-manager-image">
 
-                  <img
-                    src={item.image_url}
-                    alt={item.title}
-                  />
+                    <img
+                      src={item.image_url}
+                      alt={item.title}
+                    />
 
-                </div>
+                  </div>
 
+                  {/* CONTENT */}
 
-                <div className="portfolio-manager-card-content">
+                  <div className="portfolio-manager-card-content">
 
-                  <span>
-                    {item.category}
-                  </span>
+                    <span>
+                      {item.category}
+                    </span>
 
-                  <h3>
-                    {item.title}
-                  </h3>
+                    <h3>
+                      {item.title}
+                    </h3>
 
-                  <small>
-                    {item.created_at
-                      ? new Date(
-                          item.created_at
-                        ).toLocaleDateString()
-                      : ""}
-                  </small>
+                    <small>
+                      {item.created_at
+                        ? new Date(
+                            item.created_at
+                          ).toLocaleDateString()
+                        : ""}
+                    </small>
 
+                    {/* ACTIONS */}
 
-                  <div className="portfolio-manager-actions">
+                    <div className="portfolio-manager-actions">
 
-                    <button
-                      className="view-button"
-                      onClick={() =>
-                        window.open(
-                          item.image_url,
-                          "_blank"
-                        )
-                      }
-                    >
-                      View
-                    </button>
+                      <button
+                        type="button"
+                        className="view-button"
+                        onClick={() =>
+                          window.open(
+                            item.image_url,
+                            "_blank"
+                          )
+                        }
+                      >
+                        View
+                      </button>
 
-                    <button
-                      className="edit-button"
-                      onClick={() =>
-                        handleEdit(item)
-                      }
-                    >
-                      Edit
-                    </button>
+                      <button
+                        type="button"
+                        className="edit-button"
+                        onClick={() =>
+                          handleEdit(
+                            item
+                          )
+                        }
+                      >
+                        Edit
+                      </button>
 
-                    <button
-                      className="delete-button"
-                      onClick={() =>
-                        handleDelete(item.id)
-                      }
-                    >
-                      Delete
-                    </button>
+                      <button
+                        type="button"
+                        className="delete-button"
+                        onClick={() =>
+                          handleDelete(
+                            item.id
+                          )
+                        }
+                      >
+                        Delete
+                      </button>
+
+                    </div>
 
                   </div>
 
                 </div>
-
-              </div>
-
-            ))}
+              )
+            )}
 
           </div>
-
         )}
 
     </div>

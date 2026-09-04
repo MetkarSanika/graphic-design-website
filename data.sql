@@ -1,6 +1,4 @@
-CREATE DATABASE saranggraphics;
-
-USE saranggraphics;
+USE defaultdb;
 
 CREATE TABLE contacts (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -20,9 +18,9 @@ ALTER TABLE contacts
 ADD COLUMN status VARCHAR(30) DEFAULT 'New';
 
 CREATE TABLE portfolio (
-  id INT AUTO_INCREMENT PRIMARY KEY,
-  title VARCHAR(255) NOT NULL,
-  category VARCHAR(100) NOT NULL,
-  image_url TEXT NOT NULL,
-  created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    category VARCHAR(255) NOT NULL,
+    image_url VARCHAR(500) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

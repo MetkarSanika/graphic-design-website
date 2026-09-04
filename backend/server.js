@@ -9,10 +9,13 @@ require("dotenv").config();
 const app = express();
 
 // ======================================
-// PORT
+// PORT & BASE URL
 // ======================================
 
 const PORT = process.env.PORT || 5000;
+
+const BASE_URL =
+  process.env.BASE_URL || `http://localhost:${PORT}`;
 
 // ======================================
 // MIDDLEWARE
@@ -35,20 +38,22 @@ if (!fs.existsSync(uploadDir)) {
 // SERVE UPLOADED IMAGES
 // ======================================
 
-app.use(
-  "/uploads",
-  express.static(uploadDir)
-);
+app.use("/uploads", express.static(uploadDir));
 
 // ======================================
-// MYSQL CONNECTION
+// MYSQL CONNECTION - AIVEN
 // ======================================
 
 const db = mysql.createConnection({
   host: process.env.DB_HOST,
+  port: process.env.DB_PORT || 3306,
   user: process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
+
+  ssl: {
+    rejectUnauthorized: false,
+  },
 });
 
 // ======================================
@@ -176,15 +181,12 @@ app.post("/api/contact", (req, res) => {
         );
 
         return res.status(500).json({
-          message:
-            "Failed to save enquiry.",
+          message: "Failed to save enquiry.",
         });
       }
 
       res.status(201).json({
-        message:
-          "Enquiry saved successfully.",
-
+        message: "Enquiry saved successfully.",
         id: result.insertId,
       });
     }
@@ -210,8 +212,7 @@ app.get("/api/contact", (req, res) => {
       );
 
       return res.status(500).json({
-        message:
-          "Failed to fetch enquiries.",
+        message: "Failed to fetch enquiries.",
       });
     }
 
@@ -235,9 +236,7 @@ app.put(
       "Completed",
     ];
 
-    if (
-      !allowedStatuses.includes(status)
-    ) {
+    if (!allowedStatuses.includes(status)) {
       return res.status(400).json({
         message: "Invalid status.",
       });
@@ -265,9 +264,7 @@ app.put(
           });
         }
 
-        if (
-          result.affectedRows === 0
-        ) {
+        if (result.affectedRows === 0) {
           return res.status(404).json({
             message:
               "Enquiry not found.",
@@ -313,9 +310,7 @@ app.delete(
           });
         }
 
-        if (
-          result.affectedRows === 0
-        ) {
+        if (result.affectedRows === 0) {
           return res.status(404).json({
             message:
               "Enquiry not found.",
@@ -351,8 +346,7 @@ app.post(
     ) {
       return res.json({
         success: true,
-        message:
-          "Login successful",
+        message: "Login successful",
       });
     }
 
@@ -407,7 +401,7 @@ app.get(
               !imageUrl.startsWith("http")
             ) {
               imageUrl =
-                `http://localhost:${PORT}${imageUrl}`;
+                `${BASE_URL}${imageUrl}`;
             }
 
             return {
@@ -469,8 +463,6 @@ app.post(
             err
           );
 
-          // Delete uploaded image
-          // if database insert fails
           try {
             fs.unlinkSync(
               path.join(
@@ -497,7 +489,7 @@ app.post(
           id: result.insertId,
 
           image_url:
-            `http://localhost:${PORT}${imageUrl}`,
+            `${BASE_URL}${imageUrl}`,
         });
       }
     );
@@ -519,19 +511,16 @@ app.put(
       category,
     } = req.body;
 
-    if (
-      !title ||
-      !category
-    ) {
+    if (!title || !category) {
       return res.status(400).json({
         message:
           "Title and category are required.",
       });
     }
 
-    // -------------------------------
+    // ==================================
     // NEW IMAGE
-    // -------------------------------
+    // ==================================
 
     if (req.file) {
       const newImageUrl =
@@ -558,9 +547,7 @@ app.put(
             });
           }
 
-          if (
-            rows.length === 0
-          ) {
+          if (rows.length === 0) {
             return res.status(404).json({
               message:
                 "Portfolio item not found.",
@@ -633,7 +620,7 @@ app.put(
                   "Portfolio updated successfully.",
 
                 image_url:
-                  `http://localhost:${PORT}${newImageUrl}`,
+                  `${BASE_URL}${newImageUrl}`,
               });
             }
           );
@@ -641,9 +628,9 @@ app.put(
       );
     }
 
-    // -------------------------------
+    // ==================================
     // NO NEW IMAGE
-    // -------------------------------
+    // ==================================
 
     else {
       const sql = `
@@ -673,9 +660,7 @@ app.put(
             });
           }
 
-          if (
-            result.affectedRows === 0
-          ) {
+          if (result.affectedRows === 0) {
             return res.status(404).json({
               message:
                 "Portfolio item not found.",
@@ -722,9 +707,7 @@ app.delete(
           });
         }
 
-        if (
-          rows.length === 0
-        ) {
+        if (rows.length === 0) {
           return res.status(404).json({
             message:
               "Portfolio item not found.",
@@ -837,7 +820,7 @@ app.listen(
   PORT,
   () => {
     console.log(
-      `Server running on http://localhost:${PORT}`
+      `Server running on ${BASE_URL}`
     );
   }
 );
